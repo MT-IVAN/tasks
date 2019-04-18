@@ -1796,7 +1796,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      modelDescription: ''
+      modelDescription: '',
+      status: ''
     };
   },
   mounted: function mounted() {
@@ -1807,7 +1808,8 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       var params = {
-        description: this.modelDescription
+        description: this.modelDescription,
+        status: "creado"
       };
       this.modelDescription = '';
       axios.post('tasks', params).then(function (response) {
@@ -1849,6 +1851,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -1870,7 +1875,12 @@ __webpack_require__.r(__webpack_exports__);
       this.tasks.splice(index, 1);
     },
     updateTask: function updateTask(index, task) {
-      this.tasks[index] = task;
+      this.tasks[index].description = task.description;
+      console.log(task);
+    },
+    updateTask2: function updateTask2(index, task) {
+      this.tasks[index].status = task.status;
+      console.log(task);
     }
   }
 });
@@ -1886,6 +1896,15 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -1944,6 +1963,25 @@ __webpack_require__.r(__webpack_exports__);
         var task = response.data;
 
         _this2.$emit('update', task);
+      });
+    },
+    onClickUpdateStatus: function onClickUpdateStatus() {
+      var _this3 = this;
+
+      var params = {
+        status: ''
+      };
+
+      if (this.task.status == 'creado') {
+        params.status = 'ejecucion';
+      } else if (this.task.status == 'ejecucion') {
+        params.status = 'terminado';
+      }
+
+      axios.put("tasks/update/status/".concat(this.task.id), params).then(function (response) {
+        var task = response.data;
+
+        _this3.$emit('update2', task);
       });
     }
   }
@@ -36993,7 +37031,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "card" }, [
+  return _c("div", [
     _c("div", { staticClass: "card-header" }, [
       _vm._v("Mi siguiente tarea sera")
     ]),
@@ -37026,7 +37064,7 @@ var render = function() {
                 }
               ],
               staticClass: "form-control",
-              attrs: { type: "text", name: "task" },
+              attrs: { autocomplete: "off", type: "text", name: "task" },
               domProps: { value: _vm.modelDescription },
               on: {
                 input: function($event) {
@@ -37038,22 +37076,55 @@ var render = function() {
               }
             }),
             _vm._v(" "),
-            _c("h4", [_vm._v("hgodsf")])
-          ]),
-          _vm._v(" "),
-          _vm.modelDescription.length > 5
-            ? _c("div", [_c("p", [_vm._v("mayor")])])
-            : _vm.modelDescription.length < 5
-            ? _c("div", [
-                _vm._v("\n                        menor\n                    ")
-              ])
-            : _vm._e(),
-          _vm._v(" "),
-          _c(
-            "button",
-            { staticClass: "btn btn-primary", attrs: { type: "submit" } },
-            [_vm._v("Crear tarea")]
-          )
+            _vm.modelDescription.length == 0
+              ? _c("div", [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary",
+                      attrs: { type: "submit", disabled: "" }
+                    },
+                    [_vm._v("Crear tarea")]
+                  )
+                ])
+              : _vm.modelDescription.length > 100 ||
+                _vm.modelDescription.length < 3
+              ? _c("div", [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary",
+                      attrs: { type: "submit", disabled: "" }
+                    },
+                    [_vm._v("Crear tarea")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      staticClass: "alert alert-danger",
+                      attrs: { role: "alert" }
+                    },
+                    [
+                      _vm._v(
+                        "\n                        La tarea solo puede contener 100 caracteres y minimo 2 caracteres\n                        "
+                      )
+                    ]
+                  )
+                ])
+              : _vm.modelDescription.length <= 100
+              ? _c("div", [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary",
+                      attrs: { type: "submit" }
+                    },
+                    [_vm._v("Crear tarea")]
+                  )
+                ])
+              : _vm._e()
+          ])
         ]
       )
     ])
@@ -37081,32 +37152,43 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "row justify-content-center" }, [
+  return _c("div", [
     _c(
       "div",
-      { staticClass: "col-md-8" },
-      [
-        _c("form-component", { on: { new: _vm.addTask } }),
-        _vm._v(" "),
-        _vm._l(_vm.tasks, function(task, index) {
-          return _c("tasks-component", {
-            key: task.id,
-            attrs: { task: task },
-            on: {
-              delete: function($event) {
-                return _vm.deleteTask(index)
-              },
-              update: function($event) {
-                var i = arguments.length,
-                  argsArray = Array(i)
-                while (i--) argsArray[i] = arguments[i]
-                return _vm.updateTask.apply(void 0, [index].concat(argsArray))
-              }
+      { staticClass: "card-columns" },
+      _vm._l(_vm.tasks, function(task, index) {
+        return _c("tasks-component", {
+          key: task.id,
+          attrs: { task: task },
+          on: {
+            delete: function($event) {
+              return _vm.deleteTask(index)
+            },
+            update: function($event) {
+              var i = arguments.length,
+                argsArray = Array(i)
+              while (i--) argsArray[i] = arguments[i]
+              return _vm.updateTask.apply(void 0, [index].concat(argsArray))
+            },
+            update2: function($event) {
+              var i = arguments.length,
+                argsArray = Array(i)
+              while (i--) argsArray[i] = arguments[i]
+              return _vm.updateTask2.apply(void 0, [index].concat(argsArray))
             }
-          })
+          }
         })
-      ],
-      2
+      }),
+      1
+    ),
+    _vm._v(" "),
+    _c("hr"),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "justify-content-center col-md-6" },
+      [_c("form-component", { on: { new: _vm.addTask } })],
+      1
     )
   ])
 }
@@ -37132,14 +37214,31 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "card" }, [
-    _c("div", { staticClass: "card-header" }, [
-      _vm._v("Publicado en " + _vm._s(_vm.task.created_at))
-    ]),
+  return _c("div", { staticClass: "card p-12" }, [
+    _vm.task.status == "creado"
+      ? _c("div", { staticClass: "card-header bg-danger progress-bar" }, [
+          _vm._v("Estado de la tarea: "),
+          _c("strong", [_vm._v(_vm._s(_vm.task.status))])
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.task.status == "ejecucion"
+      ? _c("div", { staticClass: "card-header bg-info progress-bar" }, [
+          _vm._v("Estado de la tarea: "),
+          _c("strong", [_vm._v(_vm._s(_vm.task.status))])
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.task.status == "terminado"
+      ? _c("div", { staticClass: "card-header bg-success progress-bar" }, [
+          _vm._v("Estado de la tarea: "),
+          _c("strong", [_vm._v(_vm._s(_vm.task.status))])
+        ])
+      : _vm._e(),
     _vm._v(" "),
     _c("div", { staticClass: "card-body" }, [
       _vm.editMode
-        ? _c("input", {
+        ? _c("textarea", {
             directives: [
               {
                 name: "model",
@@ -37159,39 +37258,58 @@ var render = function() {
               }
             }
           })
-        : _c("p", [_vm._v(_vm._s(_vm.task.description))]),
+        : _c("h3", { staticStyle: { "white-space": "pre-line" } }, [
+            _vm._v(_vm._s(_vm.task.description))
+          ]),
+      _vm._v(" "),
+      _c("hr"),
       _vm._v(" "),
       _c("div", { staticClass: "panel-footer" }, [
-        _vm.editMode
+        _vm.task.status == "creado"
           ? _c(
               "button",
               {
-                staticClass: "btn btn-success",
+                staticClass: "btn btn-outline-info btn-sm",
                 on: {
                   click: function($event) {
-                    return _vm.onClickUpdate()
+                    return _vm.onClickUpdateStatus()
                   }
                 }
               },
-              [_vm._v("Guardar cambios")]
+              [_vm._v("Iniciar tarea")]
             )
-          : _c(
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.task.status == "ejecucion"
+          ? _c(
               "button",
               {
-                staticClass: "btn btn-default",
+                staticClass: "btn btn-outline-info btn-sm",
                 on: {
                   click: function($event) {
-                    return _vm.onClickEdit()
+                    return _vm.onClickUpdateStatus()
                   }
                 }
               },
-              [_vm._v("Editar")]
-            ),
+              [_vm._v("Terminar tarea")]
+            )
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.task.status == "terminado"
+          ? _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-info btn-sm",
+                attrs: { disabled: "" }
+              },
+              [_vm._v("Tarea terminada")]
+            )
+          : _vm._e(),
         _vm._v(" "),
         _c(
           "button",
           {
-            staticClass: "btn btn-danger",
+            staticClass: "btn btn-outline-dark float-right btn-sm",
             on: {
               click: function($event) {
                 return _vm.onClickDelete()
@@ -37199,7 +37317,33 @@ var render = function() {
             }
           },
           [_vm._v("Eliminar")]
-        )
+        ),
+        _vm._v(" "),
+        _vm.editMode
+          ? _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-info float-right btn-sm",
+                on: {
+                  click: function($event) {
+                    return _vm.onClickUpdate()
+                  }
+                }
+              },
+              [_vm._v("Guardar cambios ")]
+            )
+          : _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-info float-right btn-sm",
+                on: {
+                  click: function($event) {
+                    return _vm.onClickEdit()
+                  }
+                }
+              },
+              [_vm._v("Editar ")]
+            )
       ])
     ])
   ])

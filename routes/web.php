@@ -20,3 +20,5 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::apiResource('tasks', 'TaskController');
+
+Route::put('tasks/update/status/{id}', 'TaskController@updateStatus');

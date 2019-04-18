@@ -35,6 +35,7 @@ class TaskController extends Controller
         $task = new Task();
         $task->description = $request->description;
         $task->user_id = auth()->id();
+        $task->status = $request->status;
         $task->save();
         return $task;
     }
@@ -52,6 +53,7 @@ class TaskController extends Controller
     {
         $task = Task::find($id);
         $task->description = $request->description;
+       // $task->status = $request->status;
         $task->save();
         return $task;
     }
@@ -66,5 +68,12 @@ class TaskController extends Controller
     {
         $task = Task::find($id);
         $task->delete();
+    }
+
+    public function updateStatus(Request $request, $id){
+        $task = Task::find($id);
+        $task->status = $request->status;
+        $task->save();
+        return $task;
     }
 }

@@ -3,10 +3,10 @@
 @section('content')
 <div class="container">
 
-@if(auth()->user()->admin == 1) 
+@if(auth()->user()->roll == 'admin') 
 <p>Tu eres el admin</p>
 
-<div class="card-deck">
+<div class="card-columns">
 @foreach($todasLasTareas as $tarea )
 <div class="card">
     <div class="card-body">
@@ -19,6 +19,8 @@
   </div>
 @endforeach
 @else
+
+
 <p>Tu eres el otro usuario</p>
 <my-tasks-component></my-tasks-component>
 
